@@ -5,9 +5,10 @@ import { updateCategorySchema } from '@/lib/validations'
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await requireAuth()
         const body = await request.json()
         const validatedData = updateCategorySchema.parse(body)
@@ -15,7 +16,7 @@ export async function PUT(
         // Verify category belongs to user
         const existingCategory = await prisma.category.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: (user as any).id,
             },
         })
@@ -31,7 +32,7 @@ export async function PUT(
                     userId: (user as any).id,
                     name: validatedData.name,
                     type: validatedData.type || existingCategory.type,
-                    id: { not: params.id },
+                    id: { not: id },
                 },
             })
 
@@ -41,7 +42,7 @@ export async function PUT(
         }
 
         const category = await prisma.category.update({
-            where: { id: params.id },
+            where: { id: id },
             data: validatedData,
         })
 
@@ -60,15 +61,16 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await requireAuth()
 
         // Verify category belongs to user
         const category = await prisma.category.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: (user as any).id,
             },
         })
@@ -79,7 +81,7 @@ export async function DELETE(
 
         // Check if category has transactions
         const transactionCount = await prisma.transaction.count({
-            where: { categoryId: params.id },
+            where: { categoryId: id },
         })
 
         if (transactionCount > 0) {
@@ -90,7 +92,7 @@ export async function DELETE(
         }
 
         await prisma.category.delete({
-            where: { id: params.id },
+            where: { id: id },
         })
 
         return successResponse({ message: 'Category deleted successfully' })

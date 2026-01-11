@@ -5,9 +5,10 @@ import { updateTransactionSchema } from '@/lib/validations'
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await requireAuth()
         const body = await request.json()
         const validatedData = updateTransactionSchema.parse(body)
@@ -15,7 +16,7 @@ export async function PUT(
         // Verify transaction belongs to user
         const existingTransaction = await prisma.transaction.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: (user as any).id,
             },
         })
@@ -45,7 +46,7 @@ export async function PUT(
         }
 
         const transaction = await prisma.transaction.update({
-            where: { id: params.id },
+            where: { id: id },
             data: validatedData,
             include: {
                 category: {
@@ -73,15 +74,16 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await requireAuth()
 
         // Verify transaction belongs to user
         const transaction = await prisma.transaction.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: (user as any).id,
             },
         })
@@ -91,7 +93,7 @@ export async function DELETE(
         }
 
         await prisma.transaction.delete({
-            where: { id: params.id },
+            where: { id: id },
         })
 
         return successResponse({ message: 'Transaction deleted successfully' })
