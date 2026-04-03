@@ -38,20 +38,6 @@ export default function SettingsPage() {
                     </p>
                 </CardContent>
             </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>About</CardTitle>
-                    <CardDescription>Application information</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-2 text-sm">
-                        <p><strong>Version:</strong> 1.0.0</p>
-                        <p><strong>Built with:</strong> Next.js, TypeScript, Prisma, PostgreSQL</p>
-                        <p><strong>Features:</strong> Transaction tracking, Analytics, CSV Export</p>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     )
 }
