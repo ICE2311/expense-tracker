@@ -49,7 +49,7 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone or Navigate to the Project
 
 ```bash
-cd /home/icys/Documents/expense-tracker
+cd /expense-tracker
 ```
 
 ### 2. Install Dependencies
@@ -111,13 +111,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 7. Login with Demo Account
-
-```
-Email: demo@example.com
-Password: password123
-```
-
 ## 📁 Project Structure
 
 ```
@@ -169,7 +162,6 @@ npm run lint         # Run ESLint
 npm run db:generate  # Generate Prisma client
 npm run db:push      # Push schema changes to database
 npm run db:migrate   # Run migrations
-npm run db:seed      # Seed database with default data
 npm run db:studio    # Open Prisma Studio (database GUI)
 ```
 
@@ -260,7 +252,7 @@ npx prisma migrate deploy
 
 ## 🤝 Contributing
 
-This is a complete, production-ready application. Feel free to fork and customize for your needs!
+This is a complete ready application. Feel free to fork and customize for your needs!
 
 ## 📝 License
 
@@ -275,4 +267,4 @@ MIT License - feel free to use this project for personal or commercial purposes.
 
 ---
 
-**Made with ❤️ using Next.js App Router**
+**Made with ❤️ using Next.js ©️Icys**
