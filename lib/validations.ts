@@ -51,6 +51,9 @@ export const transactionQuerySchema = z.object({
     categoryId: z.string().optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
+    minAmount: z.coerce.number().nonnegative().optional(),
+    maxAmount: z.coerce.number().nonnegative().optional(),
+    search: z.string().optional(),
 })
 
 export const analyticsQuerySchema = z.object({
@@ -61,6 +64,11 @@ export const analyticsQuerySchema = z.object({
 export const exportQuerySchema = z.object({
     from: z.coerce.date().optional(),
     to: z.coerce.date().optional(),
+    type: z.enum(['EXPENSE', 'INCOME']).optional(),
+    categoryId: z.string().optional(),
+    minAmount: z.coerce.number().nonnegative().optional(),
+    maxAmount: z.coerce.number().nonnegative().optional(),
+    search: z.string().optional(),
 })
 
 // Type exports

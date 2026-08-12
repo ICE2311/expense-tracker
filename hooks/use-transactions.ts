@@ -31,21 +31,33 @@ export function useTransactions(params?: {
     limit?: number
     type?: 'EXPENSE' | 'INCOME'
     categoryId?: string
-    startDate?: Date
-    endDate?: Date
+    startDate?: Date | string
+    endDate?: Date | string
+    minAmount?: number | string
+    maxAmount?: number | string
+    search?: string
 }) {
     const queryParams = new URLSearchParams()
     if (params?.page) queryParams.set('page', params.page.toString())
     if (params?.limit) queryParams.set('limit', params.limit.toString())
     if (params?.type) queryParams.set('type', params.type)
-    if (params?.categoryId) queryParams.set('categoryId', params.categoryId)
-    if (params?.startDate) queryParams.set('startDate', params.startDate.toISOString())
-    if (params?.endDate) queryParams.set('endDate', params.endDate.toISOString())
+    if (params?.categoryId && params.categoryId !== 'ALL') queryParams.set('categoryId', params.categoryId)
+    if (params?.startDate) {
+        const val = typeof params.startDate === 'string' ? params.startDate : params.startDate.toISOString()
+        queryParams.set('startDate', val)
+    }
+    if (params?.endDate) {
+        const val = typeof params.endDate === 'string' ? params.endDate : params.endDate.toISOString()
+        queryParams.set('endDate', val)
+    }
+    if (params?.minAmount !== undefined && params.minAmount !== '') queryParams.set('minAmount', params.minAmount.toString())
+    if (params?.maxAmount !== undefined && params.maxAmount !== '') queryParams.set('maxAmount', params.maxAmount.toString())
+    if (params?.search && params.search.trim()) queryParams.set('search', params.search.trim())
 
     return useQuery({
         queryKey: ['transactions', params],
         queryFn: async () => {
-            const response = await fetch(`/api/transactions?${queryParams}`)
+            const response = await fetch(`/api/transactions?${queryParams.toString()}`)
             if (!response.ok) throw new Error('Failed to fetch transactions')
             return response.json()
         },

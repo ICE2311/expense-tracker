@@ -8,13 +8,24 @@ export async function GET(request: NextRequest) {
         const user = await requireAuth()
         const searchParams = request.nextUrl.searchParams
 
+        const rawStartDate = searchParams.get('startDate')
+        const rawEndDate = searchParams.get('endDate')
+        const rawMinAmount = searchParams.get('minAmount')
+        const rawMaxAmount = searchParams.get('maxAmount')
+        const rawSearch = searchParams.get('search')
+        const rawCategoryId = searchParams.get('categoryId')
+        const rawType = searchParams.get('type')
+
         const query = transactionQuerySchema.parse({
             page: searchParams.get('page') || '1',
             limit: searchParams.get('limit') || '10',
-            type: searchParams.get('type') || undefined,
-            categoryId: searchParams.get('categoryId') || undefined,
-            startDate: searchParams.get('startDate') || undefined,
-            endDate: searchParams.get('endDate') || undefined,
+            type: rawType && rawType !== 'ALL' ? rawType : undefined,
+            categoryId: rawCategoryId && rawCategoryId !== 'ALL' ? rawCategoryId : undefined,
+            startDate: rawStartDate || undefined,
+            endDate: rawEndDate || undefined,
+            minAmount: rawMinAmount !== null && rawMinAmount !== '' ? rawMinAmount : undefined,
+            maxAmount: rawMaxAmount !== null && rawMaxAmount !== '' ? rawMaxAmount : undefined,
+            search: rawSearch?.trim() ? rawSearch.trim() : undefined,
         })
 
         const where: any = {
@@ -35,8 +46,29 @@ export async function GET(request: NextRequest) {
                 where.transactionDate.gte = query.startDate
             }
             if (query.endDate) {
-                where.transactionDate.lte = query.endDate
+                const end = new Date(query.endDate)
+                if (end.getUTCHours() === 0 && end.getUTCMinutes() === 0 && end.getUTCSeconds() === 0 && end.getUTCMilliseconds() === 0) {
+                    end.setUTCHours(23, 59, 59, 999)
+                }
+                where.transactionDate.lte = end
             }
+        }
+
+        if (query.minAmount !== undefined || query.maxAmount !== undefined) {
+            where.amount = {}
+            if (query.minAmount !== undefined) {
+                where.amount.gte = query.minAmount
+            }
+            if (query.maxAmount !== undefined) {
+                where.amount.lte = query.maxAmount
+            }
+        }
+
+        if (query.search) {
+            where.OR = [
+                { description: { contains: query.search, mode: 'insensitive' } },
+                { category: { name: { contains: query.search, mode: 'insensitive' } } },
+            ]
         }
 
         const [transactions, total] = await Promise.all([
